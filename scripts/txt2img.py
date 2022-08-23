@@ -273,7 +273,7 @@ def main():
     # date + time
     datetimeStr = datetime.datetime.now().isoformat()
     # Filename-safe prompt string
-    slugPrompt = "".join(c if c.isalnum() else "_" for c in s)
+    slugPrompt = "".join(c if c.isalnum() else "_" for c in opt.prompt)
 
     sample_path = os.path.join(outpath, "samples")
     os.makedirs(sample_path, exist_ok=True)
