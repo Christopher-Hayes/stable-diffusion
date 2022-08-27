@@ -92,7 +92,7 @@ class PLMSSampler(object):
         # sampling
         C, H, W = shape
         size = (batch_size, C, H, W)
-        print(f'Data shape for PLMS sampling is {size}')
+        #print(f'Data shape for PLMS sampling is {size}')
 
         samples, intermediates = self.plms_sampling(conditioning, size,
                                                     callback=callback,
@@ -134,12 +134,12 @@ class PLMSSampler(object):
         intermediates = {'x_inter': [img], 'pred_x0': [img]}
         time_range = list(reversed(range(0,timesteps))) if ddim_use_original_steps else np.flip(timesteps)
         total_steps = timesteps if ddim_use_original_steps else timesteps.shape[0]
-        print(f"Running PLMS Sampling with {total_steps} timesteps")
+        #print(f"Running PLMS Sampling with {total_steps} timesteps")
 
         # iterator = tqdm(time_range, desc='PLMS Sampler', total=total_steps)
         old_eps = []
 
-        for i, step in time_range: # enumerate(iterator):
+        for i, step in enumerate(time_range): # enumerate(iterator):
             index = total_steps - i - 1
             ts = torch.full((b,), step, device=device, dtype=torch.long)
             ts_next = torch.full((b,), time_range[min(i + 1, len(time_range) - 1)], device=device, dtype=torch.long)
