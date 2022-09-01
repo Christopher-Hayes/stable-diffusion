@@ -14,7 +14,7 @@ from torch.optim.lr_scheduler import LambdaLR
 from einops import rearrange, repeat
 from contextlib import contextmanager
 from functools import partial
-from tqdm import tqdm
+# from tqdm import tqdm
 from torchvision.utils import make_grid
 from pytorch_lightning.utilities.distributed import rank_zero_only
 
@@ -255,11 +255,14 @@ class DDPM(pl.LightningModule):
         b = shape[0]
         img = torch.randn(shape, device=device)
         intermediates = [img]
-        for i in tqdm(reversed(range(0, self.num_timesteps)), desc='Sampling t', total=self.num_timesteps):
+
+        # for i in tqdm(reversed(range(0, self.num_timesteps)), desc='Sampling t', total=self.num_timesteps):
+        for i in enumerate(reversed(range(0, self.num_timesteps))):
             img = self.p_sample(img, torch.full((b,), i, device=device, dtype=torch.long),
                                 clip_denoised=self.clip_denoised)
             if i % self.log_every_t == 0 or i == self.num_timesteps - 1:
                 intermediates.append(img)
+
         if return_intermediates:
             return img, intermediates
         return img
@@ -529,7 +532,8 @@ class LatentDiffusion(DDPM):
 
     def _get_denoise_row_from_list(self, samples, desc='', force_no_decoder_quantization=False):
         denoise_row = []
-        for zd in tqdm(samples, desc=desc):
+        # for zd in tqdm(samples, desc=desc):
+        for zd in enumerate(samples):
             denoise_row.append(self.decode_first_stage(zd.to(self.device),
                                                             force_not_quantize=force_no_decoder_quantization))
         n_imgs_per_row = len(denoise_row)
@@ -1133,9 +1137,10 @@ class LatentDiffusion(DDPM):
 
         if start_T is not None:
             timesteps = min(timesteps, start_T)
-        iterator = tqdm(reversed(range(0, timesteps)), desc='Progressive Generation',
-                        total=timesteps) if verbose else reversed(
-            range(0, timesteps))
+
+        # iterator = tqdm(reversed(range(0, timesteps)), desc='Progressive Generation', total=timesteps) if verbose else reversed(range(0, timesteps))
+        iterator = reversed(range(0, timesteps))
+
         if type(temperature) == float:
             temperature = [temperature] * timesteps
 
@@ -1183,8 +1188,9 @@ class LatentDiffusion(DDPM):
 
         if start_T is not None:
             timesteps = min(timesteps, start_T)
-        iterator = tqdm(reversed(range(0, timesteps)), desc='Sampling t', total=timesteps) if verbose else reversed(
-            range(0, timesteps))
+
+        # iterator = tqdm(reversed(range(0, timesteps)), desc='Sampling t', total=timesteps) if verbose else reversed(range(0, timesteps))
+        iterator = reversed(range(0, timesteps))
 
         if mask is not None:
             assert x0 is not None
